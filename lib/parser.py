@@ -16,6 +16,7 @@ def parse(file_path: str) -> dict:
         raise FileNotFoundError(
             'The specified folder does not contain macro.yaml file')
 
+    # Read yaml steps file
     with open(f'{_path}/macro.yaml', 'r', encoding='utf-8') as stream:
         try:
             macro_steps = yaml.safe_load(stream)
@@ -23,7 +24,3 @@ def parse(file_path: str) -> dict:
             print(exc)
 
     return macro_steps
-
-
-def prettyPrint(_dict: dict) -> None:
-    print(json.dumps(_dict, indent=3))

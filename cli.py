@@ -7,8 +7,7 @@ if __name__ == '__main__':
     if (arg_len==2):   
         kodxauto.start(argv[1])
     else:
-        print(argv)
         print("""Usage:
-        argv[1]: name of the saved macros
+        argv[1]: name of the saved macros folder
         """)
     
