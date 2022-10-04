@@ -1,0 +1,6 @@
+config:
+    key: home
+steps:
+    - click(800, 500, duration=1)
+    - move(100, 100, duration=1)
+    - click(800,500, duration=1)
