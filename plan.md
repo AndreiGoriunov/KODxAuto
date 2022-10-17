@@ -1,0 +1,1 @@
+1. Create keyboard listener to implement an ability to bind macro execution/forced termination to a key.

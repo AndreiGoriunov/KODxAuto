@@ -5,8 +5,10 @@ import sys
 import pyautogui as pg
 from yaml import YAMLError, safe_load
 
+# Static
 DIRNAME = os.path.dirname(os.path.abspath(__file__))
 STATUSES = {0: 'running', 1: 'complete', 2: 'error'}
+
 # Configure logging
 logging.basicConfig(filename=os.path.join(DIRNAME, '..\\run.log'), filemode='w', level=logging.DEBUG, encoding='utf-8',
                     format='%(asctime)s [%(levelname)s]: %(message)s', datefmt='%H:%M:%S')
@@ -18,17 +20,17 @@ class KODxAuto:
     def __init__(self, file_path):
         logging.info('KODxAuto Started.')
         self.file_path = file_path
-        self.steps = None
-        self.config = None
+        self._steps = None
+        self._config = None
         self.__path = None
         self.__parse()
         logging.info('KodXAuto Initialized.')
 
     def start(self):
         # Print box
-        text = f'Macro: {self.file_path}\nNumber of steps: {len(self.steps)}'
+        text = f'Macro: {self.file_path}\nNumber of steps: {len(self._steps)}'
         print_msg_box(msg=text, title='KODXAuto')
-        executor = self.Executor(self.steps)
+        executor = self.Executor(self._steps)
         executor.execute_all()
 
     def __parse(self):
@@ -53,9 +55,9 @@ class KODxAuto:
                     logging.error(exc)
 
         # Set variables
-        self.steps = macro['steps']
-        self.config = macro['config']
-        
+        self._steps = macro['steps']
+        self._config = macro['config']
+
     class Executor:
         """A class for executing steps from a list"""
 
@@ -123,6 +125,11 @@ class KODxAuto:
 
             self.__status = 1
             logging.info('Execution complete.')
+
+
+class KB_Listener():
+    def __init__():
+        pass
 
 
 def print_msg_box(msg, indent=1, width=None, title=None):

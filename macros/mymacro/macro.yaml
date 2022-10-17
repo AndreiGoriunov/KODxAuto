@@ -1,5 +1,5 @@
 config:
-    key: home
+    key: 1
 steps:
     - moveTo(500, 500, duration=1)
     - moveTo(700, 500, duration=1)

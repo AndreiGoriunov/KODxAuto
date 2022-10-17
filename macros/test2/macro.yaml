@@ -1,1 +1,15 @@
-click()
+config:
+  key: insert
+
+steps:
+  - step: moveTo(500,500,duration=1)
+  - step: moveTo(700,500,duration=1)
+  - loop:
+      times: 3
+      steps:
+        - step: move(-100,0,duration=0.5)
+        - step: move(0,-100,duration=0.5)
+  - loop:
+      times: 2
+      steps:
+        - step: move(0,100,duration=0.5)
