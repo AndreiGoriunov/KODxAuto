@@ -1,0 +1,4 @@
+yaml
+pyautogui
+
+python 10.5 and above

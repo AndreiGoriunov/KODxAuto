@@ -1,0 +1,3 @@
+steps:
+  - Move mouse to 2400,400
+  - Move mouse to 2600,600 over 1 sec
