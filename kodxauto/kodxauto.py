@@ -4,7 +4,7 @@ from configparser import ConfigParser
 from time import perf_counter
 
 from .executor import Executor
-from .step_handler import StepParser
+from .step_handler import StepParser, GlobalVars
 
 
 class KODxAuto:
@@ -71,9 +71,12 @@ class KODxAuto:
         macro_name = self.get_property("macro_name")
 
         # Path to the macros directory containing steps
-        _path = os.path.join(
+        macros_directory = os.path.join(
             self.root_abs_path, self.get_property("macros_folder_path"), macro_name
         )
+
+        _macros_resources_dir = os.path.join(macros_directory, "resources")
+        GlobalVars.macros_resources_dir = _macros_resources_dir
 
         # Check "recompile" property
         recompile = self.get_property("recompile")
@@ -81,10 +84,10 @@ class KODxAuto:
         # If property is set to true or not set at all then recompile
         bf_parse = perf_counter()  # timer before parse/read
         if recompile is None or recompile:
-            steps = StepParser(_path).parse_steps()
+            steps = StepParser(macros_directory).parse_steps()
             logging.info(f"Parsed steps: {steps}")
         else:
-            steps = StepParser(_path).read_parsed_steps()
+            steps = StepParser(macros_directory).read_parsed_steps()
             logging.info(f"Read steps: {steps}")
         af_parse = perf_counter()  # timer after parse/read
 

@@ -10,6 +10,10 @@ regex_to_function_map = {}
 types = {r"{string}": r'"(.*)"', r"{int}": r"(\d+)", r"{float}": r"(\d+|\d+.\d+)"}
 
 
+class GlobalVars:
+    macros_resources_dir = None
+    region = None
+
 class StepParser:
     """Reads and Parses the steps from macros.yaml file.
 

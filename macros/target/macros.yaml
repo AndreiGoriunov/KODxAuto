@@ -1,0 +1,5 @@
+#https://humanbenchmark.com/tests/aim
+steps:
+  - Select working region
+  - Click "target.png" element on sreen
+  - Click "target.png" element on screen 30 times

@@ -1,8 +1,11 @@
 import logging
 
 import pyautogui as pag
+
 from .step_definitions import *
 from .step_handler import get_step_map
+
+macros_resources_dir = ""
 
 
 class Executor:
@@ -13,6 +16,7 @@ class Executor:
 
     def __init__(self, steps: list, step_defs: list = None):
         self.steps = steps
+        # macros_resources_dir = os.path.join(macros_directory, "resources")
         logging.info("Executor initialized.")
 
     # def __import_step_definitions(self):
