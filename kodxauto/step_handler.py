@@ -7,12 +7,15 @@ from yaml import YAMLError, safe_load
 # Holds a dictionary in for of { @kxa_step(regex) : function.__name__ }
 regex_to_function_map = {}
 
-types = {r"{string}": r'"(.*)"', r"{int}": r"(\d+)", r"{float}": r"(\d+|\d+.\d+)"}
-
 
 class GlobalVars:
     macros_resources_dir = None
     region = None
+
+
+class Context:
+    pass
+
 
 class StepParser:
     """Reads and Parses the steps from macros.yaml file.
@@ -120,12 +123,18 @@ def kxa_step(regex: str):
     passed to the decorator and function's name to the dictionary as
     { regex : func_name }.
     """
+    types = {r"{string}": r'"(.*)"', r"{int}": r"(\d+)", r"{float}": r"(\d+|\d+.\d+)"}
 
     def decorate(fn):
         def inner(*args):
             return fn(*args)
 
-        regex_to_function_map[regex] = fn.__name__
+        _regex = regex
+        # replacing type placeholders with regex str
+        for k, v in types.items():
+            _regex = _regex.replace(k, v)
+
+        regex_to_function_map[_regex] = fn.__name__
         return inner
 
     return decorate

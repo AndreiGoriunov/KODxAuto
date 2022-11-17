@@ -1,5 +1,6 @@
 #https://humanbenchmark.com/tests/aim
 steps:
-  - Select working region
-  - Click "target.png" element on sreen
-  - Click "target.png" element on screen 30 times
+  # - Select working region
+  - Set working region to (515,200,900,480)
+  - Click "target.png" image on screen
+  - Click "target.png" image on screen 30 times

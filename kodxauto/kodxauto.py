@@ -68,7 +68,8 @@ class KODxAuto:
             return str(property_value)
 
     def run(self, macro_name=None):
-        macro_name = self.get_property("macro_name")
+        if not macro_name:
+            macro_name = self.get_property("macro_name")
 
         # Path to the macros directory containing steps
         macros_directory = os.path.join(
