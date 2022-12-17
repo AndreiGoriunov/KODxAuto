@@ -9,4 +9,4 @@ __pycache__
 
 kodxauto.log
 depr_src
-macros.txt
+macros/*
