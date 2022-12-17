@@ -4,7 +4,7 @@ from configparser import ConfigParser
 from time import perf_counter
 
 from .executor import Executor
-from .step_handler import StepParser, GlobalVars
+from .step_handler import StepParser, KXAContext
 
 
 class KODxAuto:
@@ -27,8 +27,8 @@ class KODxAuto:
         self.root_abs_path = os.path.abspath(root_dir)
 
         # Get abs path to the kodxauto.properties file
-        self.config_path = os.path.join(self.root_abs_path, "kodxauto.properties")
-        self.__set_config_file()
+        config_path = os.path.join(self.root_abs_path, "kodxauto.properties")
+        self.__set_config_file(config_path)
         self.__set_logger()
 
     def set_properties(self, **props) -> None:
@@ -46,6 +46,7 @@ class KODxAuto:
         """Getter for properies."""
         true_options = ("1", "true", "True")
         false_options = ("0", "false", "False")
+
         if not self.properties:
             _error = "self.properties is empty. No properties were set."
             logging.error(_error)
@@ -77,19 +78,12 @@ class KODxAuto:
         )
 
         _macros_resources_dir = os.path.join(macros_directory, "resources")
-        GlobalVars.macros_resources_dir = _macros_resources_dir
-
-        # Check "recompile" property
-        recompile = self.get_property("recompile")
+        KXAContext.macros_resources_dir = _macros_resources_dir
 
         # If property is set to true or not set at all then recompile
         bf_parse = perf_counter()  # timer before parse/read
-        if recompile is None or recompile:
-            steps = StepParser(macros_directory).parse_steps()
-            logging.info(f"Parsed steps: {steps}")
-        else:
-            steps = StepParser(macros_directory).read_parsed_steps()
-            logging.info(f"Read steps: {steps}")
+        steps = StepParser(macros_directory).parse_steps()
+        logging.info(f"Parsed steps: {steps}")
         af_parse = perf_counter()  # timer after parse/read
 
         # Calling Executor
@@ -102,14 +96,14 @@ class KODxAuto:
         logging.info(f"Parsing/reading took  : {af_parse - bf_parse:.4f}")
         logging.info(f"Execution took: {af_exec - bf_exec:.4f}")
 
-    def __set_config_file(self):
-        if not os.path.exists(self.config_path):
-            _error = f"kodxauto.properties was not found on the given path: {self.config_path}"
+    def __set_config_file(self, config_path):
+        if not os.path.exists(config_path):
+            _error = f"kodxauto.properties was not found on the given path: {config_path}"
             raise FileNotFoundError(_error)
 
         # get properties file and store it in self.properties dictionary
         _config_parser = ConfigParser()
-        _config_parser.read(self.config_path)
+        _config_parser.read(config_path)
         self.properties = dict(_config_parser.items("settings"))
 
     def __set_logger(self):

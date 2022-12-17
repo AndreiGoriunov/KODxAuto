@@ -8,13 +8,9 @@ from yaml import YAMLError, safe_load
 regex_to_function_map = {}
 
 
-class GlobalVars:
+class KXAContext:
     macros_resources_dir = None
     region = None
-
-
-class Context:
-    pass
 
 
 class StepParser:
@@ -31,14 +27,14 @@ class StepParser:
         self.parsed_steps = []  # A list of parsed steps
 
     def parse_steps(self) -> list:
-        """Iterates through all the steps in macros.yaml.s
+        """Iterates through all the steps in macros.yaml.
 
         Returns a list of functions with arguments.
         """
         self.yaml_steps = self.__read_macros_yaml_file(self._path)  # Read yaml file
 
         for step in self.yaml_steps:
-            func = self.__step_matcher(step)
+            func = self.__match_steps(step)
             if func:
                 self.parsed_steps.append(func)
             else:
@@ -46,15 +42,6 @@ class StepParser:
                 logging.error(_error)
                 raise Exception(_error)
 
-        self.__write_parsed_steps_to_file()
-        return self.parsed_steps
-
-    def read_parsed_steps(self) -> list:
-        self.parsed_steps.clear
-        with open(self.macros_txt_path, "r", encoding="utf-8") as file:
-            # Append each line of the file to the list.
-            for line in file:
-                self.parsed_steps.append(line)
         return self.parsed_steps
 
     def __read_macros_yaml_file(self, _path) -> list:
@@ -75,19 +62,12 @@ class StepParser:
             raise FileNotFoundError(_error)
         return macros["steps"]
 
-    def __write_parsed_steps_to_file(self) -> None:
-        if self.parsed_steps:
-            with open(self.macros_txt_path, "w", encoding="utf-8") as file:
-                file.write("\n".join(self.parsed_steps))
-        else:
-            _error = "self.parsed_steps list is empty."
-            logging.error(_error)
-            raise ValueError(_error)
-
-    def __step_matcher(self, step) -> str:
+    def __match_steps(self, step) -> tuple:
         """Matches the yaml_steps from macros.yaml with a regex key in `regex_to_function_map`.
 
-        Return function with arguments as string or None if no match.
+        Return a tuple where: 
+        - element [0] is function object and 
+        - element [1] is function arguments in a tuple.
         """
         # Loop throug regex to func map
         for regex, func_name in regex_to_function_map.items():
@@ -98,16 +78,9 @@ class StepParser:
                 func_args = []  # Stores a list of function arguments
                 for _, gr in enumerate(groups):
                     func_args.append(type_conversion(gr))
-                return f"{func_name}{tuple(func_args)}"
+                # return f"{func_name}{tuple(func_args)}"
+                return (func_name, tuple(func_args))
         return None  # If no match was found with existing `regex_to_function_map` dict
-
-    # TODO
-    def __update_regex_types(self):
-        """TBD. Changes type aliases in @kxa_step to their regex form."""
-        for old_key in list(regex_to_function_map.keys()):
-            new_key = old_key.replace()
-            regex_to_function_map[new_key] = regex_to_function_map[old_key]
-            del regex_to_function_map[old_key]
 
 
 def get_step_map():
@@ -134,7 +107,7 @@ def kxa_step(regex: str):
         for k, v in types.items():
             _regex = _regex.replace(k, v)
 
-        regex_to_function_map[_regex] = fn.__name__
+        regex_to_function_map[_regex] = fn
         return inner
 
     return decorate

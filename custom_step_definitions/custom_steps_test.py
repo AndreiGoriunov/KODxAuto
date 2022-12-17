@@ -1,7 +1,7 @@
 import logging
 
 
-from kodxauto.step_handler import kxa_step, GlobalVars
+from kodxauto.step_handler import kxa_step, KXAContext
 
 
 @kxa_step(r"Click on {string} element")
