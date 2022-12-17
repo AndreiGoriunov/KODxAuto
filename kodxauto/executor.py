@@ -1,9 +1,6 @@
 import logging
 
-import pyautogui as pag
-
 from .step_definitions import *
-from .step_handler import get_step_map
 
 
 class Executor:
@@ -18,7 +15,6 @@ class Executor:
         logging.info("Executor initialized.")
 
     def execute(self):
-        logging.info(f"regex_to_function_map = {get_step_map()}")
         for i, step in enumerate(self.steps):
             try:
                 # Attempt to execute the step

@@ -33,7 +33,7 @@ def click_at(button: str, x: int, y: int) -> None:
 @kxa_step(r"^Click {string} image on screen$")
 def click_image_on_screen(element: str) -> None:
     region = KXAContext.region  # get region
-    element_path = os.path.join(KXAContext.macros_resources_dir, element)
+    element_path = os.path.join(KXAContext.macro_resources_dir, element)
     # Wait until element appears
     location = pag.locateCenterOnScreen(
         image=element_path,
@@ -49,7 +49,7 @@ def click_image_on_screen(element: str) -> None:
 def click_image_on_screen_times(element: str, times: int) -> None:
     """Used for fast conseccutive clicking."""
     region = KXAContext.region  # get region
-    element_path = os.path.join(KXAContext.macros_resources_dir, element)
+    element_path = os.path.join(KXAContext.macro_resources_dir, element)
     for _ in range(times):
         pag.click(
             pag.locateCenterOnScreen(
@@ -94,7 +94,7 @@ def wait_sec(sec: int):
 @kxa_step(r"^Wait for {string} image to appear$")
 def wait_for_image_to_appear(element: str):
     region = KXAContext.region  # get region
-    element_path = os.path.join(KXAContext.macros_resources_dir, element)
+    element_path = os.path.join(KXAContext.macro_resources_dir, element)
     pag.locateCenterOnScreen(
         image=element_path,
         confidence=0.8,

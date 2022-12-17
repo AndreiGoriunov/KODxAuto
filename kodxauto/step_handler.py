@@ -1,6 +1,6 @@
 import logging
-import re
 import os.path
+import re
 
 from yaml import YAMLError, safe_load
 
@@ -9,7 +9,7 @@ regex_to_function_map = {}
 
 
 class KXAContext:
-    macros_resources_dir = None
+    macro_resources_dir = None
     region = None
 
 
@@ -21,8 +21,8 @@ class StepParser:
 
     def __init__(self, _path: str):
         self._path = _path
-        self.macros_yaml_path = os.path.join(_path, "macros.yaml")
-        self.macros_txt_path = os.path.join(_path, "macros.txt")
+        self.macro_yaml_path = os.path.join(_path, "macros.yaml")
+        self.macro_txt_path = os.path.join(_path, "macros.txt")
         logging.info(f"File macros.yaml read successfully.")
         self.parsed_steps = []  # A list of parsed steps
 
@@ -31,7 +31,7 @@ class StepParser:
 
         Returns a list of functions with arguments.
         """
-        self.yaml_steps = self.__read_macros_yaml_file(self._path)  # Read yaml file
+        self.yaml_steps = self.__read_macro_yaml_file(self._path)  # Read yaml file
 
         for step in self.yaml_steps:
             func = self.__match_steps(step)
@@ -44,13 +44,13 @@ class StepParser:
 
         return self.parsed_steps
 
-    def __read_macros_yaml_file(self, _path) -> list:
+    def __read_macro_yaml_file(self, _path) -> list:
         """Reads macros.yaml file and returns a list of yaml_steps."""
         macros = None
-        logging.info(f"Attempting to open: {self.macros_yaml_path}")
+        logging.info(f"Attempting to open: {self.macro_yaml_path}")
         try:
             # Opening the file with context manager and reading yaml to dict
-            with open(self.macros_yaml_path, "r", encoding="utf-8") as file:
+            with open(self.macro_yaml_path, "r", encoding="utf-8") as file:
                 try:
                     macros = safe_load(file)
                 except YAMLError as exc:
@@ -65,8 +65,8 @@ class StepParser:
     def __match_steps(self, step) -> tuple:
         """Matches the yaml_steps from macros.yaml with a regex key in `regex_to_function_map`.
 
-        Return a tuple where: 
-        - element [0] is function object and 
+        Return a tuple where:
+        - element [0] is function object and
         - element [1] is function arguments in a tuple.
         """
         # Loop throug regex to func map
@@ -81,11 +81,6 @@ class StepParser:
                 # return f"{func_name}{tuple(func_args)}"
                 return (func_name, tuple(func_args))
         return None  # If no match was found with existing `regex_to_function_map` dict
-
-
-def get_step_map():
-    """Remove later"""
-    return regex_to_function_map
 
 
 # Decorator

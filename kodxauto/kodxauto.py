@@ -4,7 +4,7 @@ from configparser import ConfigParser
 from time import perf_counter
 
 from .executor import Executor
-from .step_handler import StepParser, KXAContext
+from .step_handler import KXAContext, StepParser
 
 
 class KODxAuto:
@@ -12,25 +12,13 @@ class KODxAuto:
 
     def __init__(self):
         self.properties = {}
-        self.root_abs_path = ""
-
-    def __str__(self):
-        return f"properties = {self.properties}, root_abs_path = {self.root_abs_path}"
-
-    def set_root_dir(self, root_dir: str) -> None:
-        """Required. Set a directory where the `kodxauto.properties` is located.
-        Required before calling run() method.
-
-        `kodxauto.properties` should be placed in the root directory of the project."""
-
-        # Get the absolute path to the directory containing kodxauto.properties
-        self.root_abs_path = os.path.abspath(root_dir)
-
-        # Get abs path to the kodxauto.properties file
-        config_path = os.path.join(self.root_abs_path, "kodxauto.properties")
-        self.__set_config_file(config_path)
+        self.__set_config_file()
         self.__set_logger()
 
+    def __str__(self):
+        return f"properties = {self.properties}"
+
+    @PendingDeprecationWarning
     def set_properties(self, **props) -> None:
         """Optional. Used to set or overwrite properties file properties.
         Available properties:
@@ -51,6 +39,7 @@ class KODxAuto:
             _error = "self.properties is empty. No properties were set."
             logging.error(_error)
             raise Exception(_error)
+
         property_value = None
         try:
             property_value = self.properties[property_name]
@@ -73,16 +62,16 @@ class KODxAuto:
             macro_name = self.get_property("macro_name")
 
         # Path to the macros directory containing steps
-        macros_directory = os.path.join(
-            self.root_abs_path, self.get_property("macros_folder_path"), macro_name
+        macro_directory = os.path.join(
+            self.get_property("macros_folder_path"), macro_name
         )
 
-        _macros_resources_dir = os.path.join(macros_directory, "resources")
-        KXAContext.macros_resources_dir = _macros_resources_dir
+        _macro_resources_dir = os.path.join(macro_directory, "resources")
+        KXAContext.macro_resources_dir = _macro_resources_dir
 
         # If property is set to true or not set at all then recompile
         bf_parse = perf_counter()  # timer before parse/read
-        steps = StepParser(macros_directory).parse_steps()
+        steps = StepParser(macro_directory).parse_steps()
         logging.info(f"Parsed steps: {steps}")
         af_parse = perf_counter()  # timer after parse/read
 
@@ -96,12 +85,14 @@ class KODxAuto:
         logging.info(f"Parsing/reading took  : {af_parse - bf_parse:.4f}")
         logging.info(f"Execution took: {af_exec - bf_exec:.4f}")
 
-    def __set_config_file(self, config_path):
+    def __set_config_file(self):
+        config_path = "kodxauto.properties"
+        # Check if kodxauto.properties exists
         if not os.path.exists(config_path):
-            _error = f"kodxauto.properties was not found on the given path: {config_path}"
+            _error = f"{config_path} was not found. Create the file in the same directory as your main program."
             raise FileNotFoundError(_error)
 
-        # get properties file and store it in self.properties dictionary
+        # Get properties file and store it in self.properties dictionary
         _config_parser = ConfigParser()
         _config_parser.read(config_path)
         self.properties = dict(_config_parser.items("settings"))
