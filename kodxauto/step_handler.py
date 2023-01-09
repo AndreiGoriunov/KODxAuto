@@ -66,24 +66,24 @@ class StepParser:
         """Matches the yaml_steps from macros.yaml with a regex key in `regex_to_function_map`.
 
         Return a tuple where:
-        - element [0] is function object and
+        - element [0] is function object.
         - element [1] is function arguments in a tuple.
         """
         # Loop throug regex to func map
-        for regex, func_name in regex_to_function_map.items():
+        for regex, func in regex_to_function_map.items():
             func_match = re.search(regex, step)
             # Check if match is found with existing regex
             if func_match:
                 groups = func_match.groups()
                 func_args = []  # Stores a list of function arguments
-                for _, gr in enumerate(groups):
-                    func_args.append(type_conversion(gr))
-                # return f"{func_name}{tuple(func_args)}"
-                return (func_name, tuple(func_args))
+                for _, group in enumerate(groups):
+                    func_args.append(type_conversion(group))
+                # return (function object, function name, (arguments))
+                return (func, tuple(func_args))
         return None  # If no match was found with existing `regex_to_function_map` dict
 
 
-# Decorator
+# Step decorator
 def kxa_step(regex: str):
     """Function decorator for KODxAuto macros steps.
 
@@ -98,7 +98,7 @@ def kxa_step(regex: str):
             return fn(*args)
 
         _regex = regex
-        # replacing type placeholders with regex str
+        # replacing types {int} {float} {string} with regex str
         for k, v in types.items():
             _regex = _regex.replace(k, v)
 

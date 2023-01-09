@@ -6,10 +6,17 @@ from time import perf_counter
 from .executor import Executor
 from .step_handler import KXAContext, StepParser
 
+kodxauto_properties_template = r"""[Settings]
+macros_directory = ./macros
+log_file_path = ./kodxauto.log
+custom_step_definitions_paths = ["custom_step_definitions\custom_steps_test.py"]
+macro_name = mouse
+"""
+
 
 class KODxAuto:
-    """KODXAuto automation class."""
-
+    """KODXAuto main automation class."""
+    status = 0
     def __init__(self):
         self.properties = {}
         self.__set_config_file()
@@ -18,11 +25,11 @@ class KODxAuto:
     def __str__(self):
         return f"properties = {self.properties}"
 
-    @PendingDeprecationWarning
+    @DeprecationWarning
     def set_properties(self, **props) -> None:
         """Optional. Used to set or overwrite properties file properties.
         Available properties:
-        - macros_folder_path (str)
+        - macros_directory (str)
         - log_file_path (str)
         - custom_step_definitions_paths (list of str)
         - macro_name (str)
@@ -38,7 +45,7 @@ class KODxAuto:
         if not self.properties:
             _error = "self.properties is empty. No properties were set."
             logging.error(_error)
-            raise Exception(_error)
+            raise ValueError(_error)
 
         property_value = None
         try:
@@ -57,33 +64,42 @@ class KODxAuto:
         else:
             return str(property_value)
 
-    def run(self, macro_name=None):
+    def run(self, macro_name=None) -> int:
         if not macro_name:
             macro_name = self.get_property("macro_name")
 
         # Path to the macros directory containing steps
         macro_directory = os.path.join(
-            self.get_property("macros_folder_path"), macro_name
+            self.get_property("macros_directory"), macro_name
         )
 
         _macro_resources_dir = os.path.join(macro_directory, "resources")
         KXAContext.macro_resources_dir = _macro_resources_dir
 
-        # If property is set to true or not set at all then recompile
-        bf_parse = perf_counter()  # timer before parse/read
+        timer_bf_parse = perf_counter()  # timer before reading steps
         steps = StepParser(macro_directory).parse_steps()
         logging.info(f"Parsed steps: {steps}")
-        af_parse = perf_counter()  # timer after parse/read
+        timer_af_parse = perf_counter()  # timer after reading steps
 
         # Calling Executor
-        bf_exec = perf_counter()  # timer before execution
+        timer_bf_exec = perf_counter()  # timer before execution
         executor = Executor(steps)
-        executor.execute()
-        af_exec = perf_counter()  # timer after execution
+        execution_status = executor.execute()
+        timer_af_exec = perf_counter()  # timer after execution
 
-        logging.info("Execution complete")
-        logging.info(f"Parsing/reading took  : {af_parse - bf_parse:.4f}")
-        logging.info(f"Execution took: {af_exec - bf_exec:.4f}")
+        logging.info(
+            f"Reading steps finished in: {timer_af_parse - timer_bf_parse:.4f}"
+        )
+        logging.info(
+            f"Macro execution finished in: {timer_af_exec - timer_bf_exec:.4f}"
+        )
+
+        if execution_status == 0:
+            logging.info("Execution complete")
+        else:
+            logging.info(f"Execution exited with status {execution_status}")
+
+        return execution_status
 
     def __set_config_file(self):
         config_path = "kodxauto.properties"

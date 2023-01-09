@@ -22,4 +22,5 @@ class Executor:
                 step[0](*step[1])
             except Exception:
                 logging.error(f"Step {i}: failed - {step}")
-                raise Exception(f"Step {i}: failed - {step}")
+                return 1
+        return 0
